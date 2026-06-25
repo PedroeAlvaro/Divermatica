@@ -78,16 +78,17 @@ function generarEquipos() {
             `${jugadoresEquipos.length - maxJugadores} quedan fuera.`, false);
     }
 
-    // Snake draft
-    const ordenados = [...jugadoresUsados].sort(
-        (a, b) => puntajeNivel(b.nivel) - puntajeNivel(a.nivel)
-    );
-    const equipos = Array.from({ length: numEquipos }, () => []);
-    let direccionIda = true, indice = 0;
+    // Snake draft corrigido
+const ordenados = [...jugadoresUsados].sort(
+    (a, b) => puntajeNivel(b.nivel) - puntajeNivel(a.nivel)
+);
+const equipos = Array.from({ length: numEquipos }, () => []);
+let direccionIda = true, indice = 0;
 
-    for (const jugador of ordenados) {
-        if (equipos[indice].length >= limiteXEquipo) continue;
-        equipos[indice].push(jugador);
+for (const jugador of ordenados) {
+    // Encontrar próximo equipo com espaço disponível
+    let tentativas = 0;
+    while (equipos[indice].length >= limiteXEquipo && tentativas < numEquipos) {
         if (direccionIda) {
             if (indice === numEquipos - 1) direccionIda = false;
             else indice++;
@@ -95,13 +96,21 @@ function generarEquipos() {
             if (indice === 0) direccionIda = true;
             else indice--;
         }
+        tentativas++;
     }
 
-    renderizarEquiposCards(equipos, nombres);
+    // Se todos os equipos estão cheios, parar
+    if (equipos[indice].length >= limiteXEquipo) break;
 
-if (jugadoresEquipos.length <= maxJugadores) {
-    mostrarMensaje('mensajeEquipos',
-        `✅ ${jugadoresUsados.length} jugadores distribuidos en ${numEquipos} equipos`);
+    equipos[indice].push(jugador);
+
+    if (direccionIda) {
+        if (indice === numEquipos - 1) direccionIda = false;
+        else indice++;
+    } else {
+        if (indice === 0) direccionIda = true;
+        else indice--;
+    }
 }
 }
 
