@@ -86,11 +86,7 @@ function generarEquipos() {
     let direccionIda = true, indice = 0;
 
     for (const jugador of ordenados) {
-        if (equipos[indice].length >= limiteXEquipo) {
-            mostrarMensaje('mensajeEquipos',
-                `⚠️ Límite de ${limiteXEquipo} jugadores por equipo alcanzado.`, false);
-            break;
-        }
+        if (equipos[indice].length >= limiteXEquipo) continue;
         equipos[indice].push(jugador);
         if (direccionIda) {
             if (indice === numEquipos - 1) direccionIda = false;
