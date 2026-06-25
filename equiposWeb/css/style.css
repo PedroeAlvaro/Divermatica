@@ -1350,3 +1350,125 @@ body {
 p {
   letter-spacing: 0.2px;
 }
+/* =====================================================
+   HOMEPAGE CARDS — REDESIGN PROFISSIONAL
+   ===================================================== */
+
+/* transforma o grid numa experiência mais premium */
+.modulos {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 20px 80px;
+  gap: 26px;
+}
+
+/* cards mais grandes e mais “app-like” */
+.modulos .tarjeta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 34px;
+  min-height: 190px;
+  border-radius: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* remove sensação “lista repetida” */
+.tarjeta-icono {
+  font-size: 42px;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+}
+
+/* títulos mais fortes */
+.modulos .tarjeta h3 {
+  font-size: 20px;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+
+/* descrição mais suave */
+.modulos .tarjeta p {
+  font-size: 13.5px;
+  color: #9aa8c2;
+  line-height: 1.5;
+}
+
+/* botão mais elegante */
+.btn-tarjeta {
+  margin-top: auto;
+  border-radius: 12px;
+}
+
+/* hover mais premium (sem exagero neon) */
+.modulos .tarjeta:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55);
+}
+
+/* =====================================================
+   REINVENÇÃO VISUAL (parece dashboard real)
+   ===================================================== */
+
+/* cada card com identidade própria */
+.modulos .tarjeta:nth-child(1)::after,
+.modulos .tarjeta:nth-child(2)::after,
+.modulos .tarjeta:nth-child(3)::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  opacity: 0.18;
+  filter: blur(10px);
+}
+
+.modulos .tarjeta:nth-child(1)::after {
+  background: #00d4ff;
+}
+
+.modulos .tarjeta:nth-child(2)::after {
+  background: #1e88e5;
+}
+
+.modulos .tarjeta:nth-child(3)::after {
+  background: #7c4dff;
+}
+
+/* =====================================================
+   RENOMEAR VISUAL (sem mudar HTML)
+   ===================================================== */
+
+/* escondemos títulos antigos */
+.modulos .tarjeta h3 {
+  font-size: 0; /* esconde texto original */
+}
+
+/* novo texto mais profissional */
+.modulos .tarjeta:nth-child(1)::before {
+  content: "Gestão de Atletas";
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.modulos .tarjeta:nth-child(2)::before {
+  content: "Modalidades Desportivas";
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.modulos .tarjeta:nth-child(3)::before {
+  content: "Geração Inteligente de Equipas";
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
