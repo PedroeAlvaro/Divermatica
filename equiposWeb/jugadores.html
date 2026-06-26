@@ -26,25 +26,7 @@
             <button onclick="mostrarTodos()">↺ Todos</button>
         </div>
 
-        <div class="tabla-contenedor">
-            <table id="tablaJugadores">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                        <th>Posición</th>
-                        <th>Nivel</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="cuerpoTabla">
-                    <tr><td colspan="7" class="sin-datos">Cargando...</td></tr>
-                </tbody>
-            </table>
-        </div>
-       <div class="formulario-panel">
+        <div class="formulario-panel">
             <h3>Datos del Jugador</h3>
             <input type="hidden" id="jugadorId">
             <div class="form-grid">
@@ -81,6 +63,24 @@
                     </select>
                 </div>
             </div>
+       <div class="tabla-contenedor">
+            <table id="tablaJugadores">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Posición</th>
+                        <th>Nivel</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                    <tr><td colspan="7" class="sin-datos">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
             <div class="form-botones">
                 <button class="btn-primario"   onclick="guardarJugador()">Guardar</button>
                 <button class="btn-secundario" onclick="limpiarFormulario()">Limpiar</button>
