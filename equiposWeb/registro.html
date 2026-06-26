@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATCHORA — Iniciar Sesión</title>
+    <title>MATCHORA — Registro</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .login-wrapper {
@@ -79,11 +79,28 @@
         }
         .btn-login:hover { opacity: 0.88; }
         .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
-        #mensajeLogin {
+        #mensajeRegistro {
             text-align: center;
             margin-top: 16px;
             font-size: 13px;
             min-height: 20px;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .login-link a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover { text-decoration: underline; }
+        .hint-campo {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
     </style>
 </head>
@@ -91,30 +108,35 @@
     <div class="login-wrapper">
         <div class="login-card">
             <div class="login-logo">MATCHORA</div>
-            <p class="login-subtitulo">Ingrese sus credenciales para continuar</p>
+            <p class="login-subtitulo">Crea tu cuenta para comenzar</p>
 
             <div class="login-campo">
                 <label>Usuario</label>
-                <input type="text" id="loginUser" placeholder="Usuario" autocomplete="username">
+                <input type="text" id="regUser" placeholder="mínimo 3 caracteres" autocomplete="username">
+                <span class="hint-campo">Solo letras, números y guión bajo</span>
             </div>
             <div class="login-campo">
                 <label>Contraseña</label>
-                <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+                <input type="password" id="regPass" placeholder="mínimo 8 caracteres" autocomplete="new-password">
+            </div>
+            <div class="login-campo">
+                <label>Confirmar Contraseña</label>
+                <input type="password" id="regConfirmar" placeholder="repite la contraseña" autocomplete="new-password">
             </div>
 
-            <button class="btn-login" id="btnLogin" onclick="hacerLogin()">Iniciar Sesión</button>
-            <p id="mensajeLogin"></p>
+            <button class="btn-login" id="btnRegistro" onclick="hacerRegistro()">Crear Cuenta</button>
+            <p id="mensajeRegistro"></p>
 
             <div class="login-link">
-                ¿No tienes cuenta? <a href="registro.html">Regístrate</a>
+                ¿Ya tienes cuenta? <a href="login.html">Iniciar Sesión</a>
             </div>
-
         </div>
     </div>
 
     <script>
         const API_URL = 'http://192.168.0.141/equiposWeb/api';
 
+        // Si ya tiene sesión activa, redirigir
         (function() {
             const token = localStorage.getItem('matchora_token');
             if (token) {
@@ -127,51 +149,54 @@
             }
         })();
 
-        document.getElementById('loginUser').addEventListener('keydown', e => {
-            if (e.key === 'Enter') document.getElementById('loginPass').focus();
+        document.getElementById('regPass').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('regConfirmar').focus();
         });
-        document.getElementById('loginPass').addEventListener('keydown', e => {
-            if (e.key === 'Enter') hacerLogin();
+        document.getElementById('regConfirmar').addEventListener('keydown', e => {
+            if (e.key === 'Enter') hacerRegistro();
         });
 
-        async function hacerLogin() {
-            const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value;
-            const btn      = document.getElementById('btnLogin');
-            const msg      = document.getElementById('mensajeLogin');
+        async function hacerRegistro() {
+            const username   = document.getElementById('regUser').value.trim();
+            const password   = document.getElementById('regPass').value;
+            const confirmar  = document.getElementById('regConfirmar').value;
+            const btn        = document.getElementById('btnRegistro');
+            const msg        = document.getElementById('mensajeRegistro');
 
-            if (!username || !password) {
+            if (!username || !password || !confirmar) {
                 msg.style.color = '#ff4d6d';
                 msg.textContent = '⚠️ Complete todos los campos';
                 return;
             }
 
             btn.disabled    = true;
-            btn.textContent = 'Verificando...';
+            btn.textContent = 'Creando cuenta...';
             msg.textContent = '';
 
             try {
-                const res  = await fetch(`${API_URL}/auth.php`, {
+                const res  = await fetch(`${API_URL}/registro.php`, {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ username, password }),
+                    body:    JSON.stringify({ username, password, confirmar }),
                 });
                 const data = await res.json();
 
-                if (res.ok && data.token) {
-                    localStorage.setItem('matchora_token', data.token);
-                    window.location.href = 'index.html';
+                if (res.ok && data.ok) {
+                    msg.style.color = '#00e676';
+                    msg.textContent = '✅ Cuenta creada. Redirigiendo...';
+                    setTimeout(() => window.location.href = 'login.html', 1500);
                 } else {
+                    const erros = Array.isArray(data.erro) ? data.erro.join(' / ') : data.erro;
                     msg.style.color = '#ff4d6d';
-                    msg.textContent = '❌ ' + (data.erro || 'Credenciales inválidas');
+                    msg.textContent = '❌ ' + erros;
                     btn.disabled    = false;
-                    btn.textContent = 'Iniciar Sesión';
+                    btn.textContent = 'Crear Cuenta';
                 }
             } catch {
                 msg.style.color = '#ff4d6d';
                 msg.textContent = '❌ Error de conexión con el servidor';
                 btn.disabled    = false;
-                btn.textContent = 'Iniciar Sesión';
+                btn.textContent = 'Crear Cuenta';
             }
         }
     </script>

@@ -1387,3 +1387,16 @@ tbody strong { color: var(--text-primary); font-weight: 600; }
   background: var(--danger);
   color: #fff;
 }
+
+.login-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .login-link a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover { text-decoration: underline; }
