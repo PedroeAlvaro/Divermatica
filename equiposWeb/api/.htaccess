@@ -1,0 +1,25 @@
+# Bloquear acesso direto ao ficheiro .env
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Bloquear acesso direto à pasta middleware
+<DirectoryMatch "middleware">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# Desativar listagem de diretórios
+Options -Indexes
+
+# Forçar HTTPS (ativar quando tiveres SSL no servidor)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Bloquear acesso a ficheiros sensíveis
+<FilesMatch "\.(env|log|sh|sql|bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

@@ -3,20 +3,36 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Responder preflight del navegador
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
-require_once 'conexion.php';
+require_once __DIR__ . '/middleware/rate_limit.php';
+require_once __DIR__ . '/middleware/jwt.php';
+require_once __DIR__ . '/middleware/validate.php';
+require_once __DIR__ . '/conexion.php';
+
+rate_limit_verificar();
+
+$env_path = __DIR__ . '/../.env';
+if (file_exists($env_path)) {
+    $linhas = file($env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($linhas as $linha) {
+        if (str_starts_with(trim($linha), '#')) continue;
+        if (!str_contains($linha, '=')) continue;
+        [$chave, $valor] = explode('=', $linha, 2);
+        $_ENV[trim($chave)] = trim($valor);
+    }
+}
+$secret  = $_ENV['JWT_SECRET'] ?? '';
+$payload = jwt_verificar($secret);
 
 $metodo = $_SERVER['REQUEST_METHOD'];
 
 switch ($metodo) {
 
-
     case 'GET':
-        $buscar = $_GET['buscar'] ?? '';
+        $buscar = sanitizar_string($_GET['buscar'] ?? '');
         if ($buscar !== '') {
             $stmt = $pdo->prepare(
                 'SELECT * FROM jugadores WHERE nombre LIKE ? ORDER BY nombre'
@@ -29,51 +45,62 @@ switch ($metodo) {
         break;
 
     case 'POST':
-        $datos = json_decode(file_get_contents('php://input'), true);
+        $raw   = json_decode(file_get_contents('php://input'), true) ?? [];
+        $dados = validar_jogador($raw);
         $stmt  = $pdo->prepare(
             'INSERT INTO jugadores (nombre, telefono, mail, posicion, nivel)
              VALUES (:nombre, :telefono, :mail, :posicion, :nivel)'
         );
         $stmt->execute([
-            ':nombre'   => $datos['nombre'],
-            ':telefono' => $datos['telefono'] ?? '',
-            ':mail'     => $datos['mail']     ?? '',
-            ':posicion' => $datos['posicion'] ?? '',
-            ':nivel'    => $datos['nivel'],
+            ':nombre'   => $dados['nombre'],
+            ':telefono' => $dados['telefono'],
+            ':mail'     => $dados['mail'],
+            ':posicion' => $dados['posicion'],
+            ':nivel'    => $dados['nivel'],
         ]);
-        echo json_encode([
-            'ok' => true,
-            'id' => $pdo->lastInsertId()
-        ]);
+        http_response_code(201);
+        echo json_encode(['ok' => true, 'id' => $pdo->lastInsertId()]);
         break;
-		
-		
+
     case 'PUT':
-        $datos = json_decode(file_get_contents('php://input'), true);
-        $stmt  = $pdo->prepare(
+        $raw   = json_decode(file_get_contents('php://input'), true) ?? [];
+        $dados = validar_jogador($raw);
+        $id    = filter_var($raw['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['erro' => 'ID inválido']);
+            exit;
+        }
+        $stmt = $pdo->prepare(
             'UPDATE jugadores
              SET nombre=:nombre, telefono=:telefono, mail=:mail,
                  posicion=:posicion, nivel=:nivel
              WHERE id=:id'
         );
         $stmt->execute([
-            ':nombre'   => $datos['nombre'],
-            ':telefono' => $datos['telefono'] ?? '',
-            ':mail'     => $datos['mail']     ?? '',
-            ':posicion' => $datos['posicion'] ?? '',
-            ':nivel'    => $datos['nivel'],
-            ':id'       => $datos['id'],
+            ':nombre'   => $dados['nombre'],
+            ':telefono' => $dados['telefono'],
+            ':mail'     => $dados['mail'],
+            ':posicion' => $dados['posicion'],
+            ':nivel'    => $dados['nivel'],
+            ':id'       => $id,
         ]);
         echo json_encode(['ok' => true]);
         break;
 
-    
     case 'DELETE':
-        $id   = $_GET['id'] ?? null;
-        if (!$id) { echo json_encode(['error' => 'ID requerido']); break; }
+        $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['erro' => 'ID inválido']);
+            exit;
+        }
         $stmt = $pdo->prepare('DELETE FROM jugadores WHERE id = ?');
         $stmt->execute([$id]);
         echo json_encode(['ok' => true]);
         break;
+
+    default:
+        http_response_code(405);
+        echo json_encode(['erro' => 'Método não permitido']);
 }
-?>
