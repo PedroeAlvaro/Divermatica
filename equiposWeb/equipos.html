@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MATCHORA - Generar Equipos</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -31,18 +31,24 @@
 
             <div class="panel-resultado">
                 <div class="config-equipos">
-				<label>Deporte:</label>
-				<select id="selDeporte" style="padding:8px;border:1px solid #CFD8DC;border-radius:6px;font-size:14px;">
-					<option value="">Cargando...</option>
-				</select>
-                <button class="btn-ver-campo" onclick="abrirCampo()">Ver Campo</button>
-				<label>Número de equipos:</label>
-				<input type="number" id="numEquipos" value="2" min="2" max="10">
 
-				<div id="nombresEquipos" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"></div>
+                    <label>Deporte:</label>
+                    <select id="selDeporte">
+                        <option value="">Cargando...</option>
+                    </select>
 
-				<button class="btn-generar" onclick="generarEquipos()">GENERAR EQUIPOS</button>
+                    <label>Número de equipos:</label>
+                    <input type="number" id="numEquipos" value="2" min="2" max="10">
+
+                    <div id="nombresEquipos"></div>
+
+                    <div class="config-botones">
+                        <button class="btn-ver-campo" onclick="abrirCampo()">🏟️ Ver Campo</button>
+                        <button class="btn-generar" onclick="generarEquipos()">⚡ GENERAR EQUIPOS</button>
+                    </div>
+
                 </div>
+
                 <div id="resultadoEquipos" class="resultado-equipos">
                     <p class="hint">Configure los equipos y presione Generar</p>
                 </div>
