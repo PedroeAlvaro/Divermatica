@@ -61,6 +61,12 @@
                         <option>Bueno</option>
                         <option>Muy Bueno</option>
                     </select>
+
+                    <div class="form-botones">
+                    <button class="btn-primario"   onclick="guardarJugador()">Guardar</button>
+                    <button class="btn-secundario" onclick="limpiarFormulario()">Limpiar</button>
+            </div>
+
                 </div>
             </div>
        <div class="tabla-contenedor">
@@ -81,10 +87,6 @@
                 </tbody>
             </table>
         </div>
-            <div class="form-botones">
-                <button class="btn-primario"   onclick="guardarJugador()">Guardar</button>
-                <button class="btn-secundario" onclick="limpiarFormulario()">Limpiar</button>
-            </div>
             <p id="mensajeEstado" class="mensaje-estado"></p>
         </div>
     </main>
