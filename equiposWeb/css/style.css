@@ -1368,3 +1368,22 @@ tbody strong { color: var(--text-primary); font-weight: 600; }
   .modal-botones { flex-direction: row; gap: 10px; justify-content: center; }
   .modal-botones button { flex: 1; min-width: 120px; }
 }
+
+/* ── Botão Logout (adicionado para autenticação) ── */
+.btn-logout {
+  margin-left: 16px;
+  padding: 7px 18px;
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+  white-space: nowrap;
+}
+.btn-logout:hover {
+  background: var(--danger);
+  color: #fff;
+}

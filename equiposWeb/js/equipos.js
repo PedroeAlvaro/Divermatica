@@ -2,11 +2,11 @@ let jugadoresEquipos = [];
 
 async function iniciarModuloEquipos() {
     try {
-        const resJ = await fetch(`${API_URL}/jugadores.php`);
+        const resJ = await apiFetch(`${API_URL}/jugadores.php`);
         jugadoresEquipos = await resJ.json();
         renderizarListaJugadores();
 
-        const resD = await fetch(`${API_URL}/deportes.php`);
+        const resD = await apiFetch(`${API_URL}/deportes.php`);
         const deportes = await resD.json();
         const sel = document.getElementById('selDeporte');
         sel.innerHTML = deportes.map(d =>

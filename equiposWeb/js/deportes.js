@@ -3,7 +3,7 @@
 let deporteEditandoId = null;
 
 async function cargarDeportes() {
-    const res  = await fetch(`${API_URL}/deportes.php`);
+    const res  = await apiFetch(`${API_URL}/deportes.php`);
     const data = await res.json();
     const cuerpo = document.getElementById('cuerpoTablaDeportes');
     if (!data.length) {
@@ -37,7 +37,7 @@ async function guardarDeporte() {
     const esEdicion = deporteEditandoId !== null;
     if (esEdicion) deporte.id = deporteEditandoId;
 
-    const res  = await fetch(`${API_URL}/deportes.php`, {
+    const res  = await apiFetch(`${API_URL}/deportes.php`, {
         method:  esEdicion ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(deporte)
@@ -61,7 +61,7 @@ function editarDeporte(id, nombre, num) {
 
 async function eliminarDeporte(id) {
     if (!confirm('¿Eliminar este deporte?')) return;
-    const res  = await fetch(`${API_URL}/deportes.php?id=${id}`, { method: 'DELETE' });
+    const res  = await apiFetch(`${API_URL}/deportes.php?id=${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (data.ok) {
         mostrarMensaje('mensajeDeporte', '✅ Eliminado');

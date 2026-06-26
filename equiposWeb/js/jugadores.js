@@ -5,7 +5,7 @@ let idEditando = null;
 
 async function cargarJugadores() {
     try {
-        const res  = await fetch(`${API_URL}/jugadores.php`);
+        const res  = await apiFetch(`${API_URL}/jugadores.php`);
         const data = await res.json();
         renderizarTabla(data);
     } catch (e) {
@@ -38,7 +38,7 @@ function renderizarTabla(lista) {
 
 async function buscarJugador() {
     const texto = document.getElementById('txtBuscar').value.trim();
-    const res   = await fetch(`${API_URL}/jugadores.php?buscar=${encodeURIComponent(texto)}`);
+    const res   = await apiFetch(`${API_URL}/jugadores.php?buscar=${encodeURIComponent(texto)}`);
     const data  = await res.json();
     renderizarTabla(data);
 }
@@ -72,7 +72,7 @@ async function guardarJugador() {
     const esEdicion = idEditando !== null;
     if (esEdicion) jugador.id = idEditando;
 
-    const res = await fetch(`${API_URL}/jugadores.php`, {
+    const res = await apiFetch(`${API_URL}/jugadores.php`, {
         method:  esEdicion ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(jugador)
@@ -104,7 +104,7 @@ function editarJugador(id, nombre, telefono, mail, posicion, nivel) {
 
 async function eliminarJugador(id) {
     if (!confirm('¿Eliminar este jugador?')) return;
-    const res  = await fetch(`${API_URL}/jugadores.php?id=${id}`, { method: 'DELETE' });
+    const res  = await apiFetch(`${API_URL}/jugadores.php?id=${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (data.ok) {
         mostrarMensaje('mensajeEstado', '✅ Jugador eliminado');
