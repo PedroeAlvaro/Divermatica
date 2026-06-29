@@ -113,7 +113,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://192.168.0.141/equiposWeb/api';
+        const API_URL = './api';
 
         (function() {
             const token = localStorage.getItem('matchora_token');
@@ -156,7 +156,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body:    JSON.stringify({ username, password }),
                 });
-                const data = await res.json();
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    data = { erro: 'Respuesta inválida del servidor' };
+                }
 
                 if (res.ok && data.token) {
                     localStorage.setItem('matchora_token', data.token);

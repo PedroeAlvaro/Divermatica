@@ -134,7 +134,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://192.168.0.141/equiposWeb/api';
+        const API_URL = './api';
 
         // Si ya tiene sesión activa, redirigir
         (function() {
@@ -179,7 +179,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body:    JSON.stringify({ username, password, confirmar }),
                 });
-                const data = await res.json();
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    data = { erro: 'Respuesta inválida del servidor' };
+                }
 
                 if (res.ok && data.ok) {
                     msg.style.color = '#00e676';

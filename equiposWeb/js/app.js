@@ -2,7 +2,7 @@
 // app.js — adicionada camada de auth
 // ─────────────────────────────────────────────
 
-const API_URL = 'http://192.168.0.141/equiposWeb/api';
+const API_URL = './api';
 
 // ── Autenticação ─────────────────────────────
 
