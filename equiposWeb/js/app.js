@@ -1,10 +1,12 @@
 // ─────────────────────────────────────────────
-// app.js — adicionada camada de auth
+// app.js — versão corrigida PRO
 // ─────────────────────────────────────────────
 
 const API_URL = 'https://deviancy-bulldozer-concave.ngrok-free.dev/equiposWeb/api';
 
-// ── Autenticação 
+// ─────────────────────────────────────────────
+// AUTENTICAÇÃO
+// ─────────────────────────────────────────────
 
 const PAGINAS_PROTEGIDAS = ['jugadores.html', 'deportes.html', 'equipos.html'];
 
@@ -49,8 +51,13 @@ function cerrarSesion() {
     window.location.href = 'login.html';
 }
 
+// ─────────────────────────────────────────────
+// API FETCH (CORRIGIDO)
+// ─────────────────────────────────────────────
+
 async function apiFetch(url, opciones = {}) {
     const token = getToken();
+
     const headers = {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
@@ -58,7 +65,11 @@ async function apiFetch(url, opciones = {}) {
         ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
     };
 
-    const res = await apiFetch(url, { ...opciones, headers });
+    // 🔥 AQUI ESTAVA O ERRO (não chamar apiFetch dentro de si mesmo)
+    const res = await fetch(url, {
+        ...opciones,
+        headers
+    });
 
     if (res.status === 401) {
         eliminarToken();
@@ -68,6 +79,10 @@ async function apiFetch(url, opciones = {}) {
 
     return res;
 }
+
+// ─────────────────────────────────────────────
+// UTILITÁRIOS
+// ─────────────────────────────────────────────
 
 function escapeHtml(value) {
     const text = String(value ?? '');
@@ -79,10 +94,6 @@ function escapeHtml(value) {
         "'": '&#39;',
     })[ch]);
 }
-
-verificarSesion();
-
-// ── Utilitários (inalterados) ─────────────────
 
 function mostrarMensaje(elementoId, texto, esError = false) {
     const el = document.getElementById(elementoId);
@@ -99,8 +110,8 @@ function limpiarMensaje(elementoId) {
 
 function badgeNivel(nivel) {
     const clases = {
-        'Medio':     'nivel-medio',
-        'Bueno':     'nivel-bueno',
+        'Medio': 'nivel-medio',
+        'Bueno': 'nivel-bueno',
         'Muy Bueno': 'nivel-muybueno'
     };
     return `<span class="${clases[nivel] || 'nivel-medio'}">${nivel}</span>`;
@@ -108,6 +119,10 @@ function badgeNivel(nivel) {
 
 function puntajeNivel(nivel) {
     if (nivel === 'Muy Bueno') return 3;
-    if (nivel === 'Bueno')     return 2;
+    if (nivel === 'Bueno') return 2;
     return 1;
 }
+
+// ─────────────────────────────────────────────
+
+verificarSesion();
