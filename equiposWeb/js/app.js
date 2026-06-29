@@ -53,6 +53,7 @@ async function apiFetch(url, opciones = {}) {
     const token = getToken();
     const headers = {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
         ...(opciones.headers || {}),
         ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
     };
