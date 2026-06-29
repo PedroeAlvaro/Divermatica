@@ -62,10 +62,21 @@ async function apiFetch(url, opciones = {}) {
     if (res.status === 401) {
         eliminarToken();
         window.location.href = 'login.html';
-        return;
+        return null;
     }
 
     return res;
+}
+
+function escapeHtml(value) {
+    const text = String(value ?? '');
+    return text.replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+    })[ch]);
 }
 
 verificarSesion();
