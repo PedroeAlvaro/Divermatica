@@ -144,4 +144,8 @@ function renderizarEquiposCards(equipos) {
 
         container.appendChild(card);
     });
+    window.abrirCampo = abrirCampo;
+window.fecharCampo = fecharCampo;
+window.iniciarModuloEquipos = iniciarModuloEquipos;
+window.generarEquipos = generarEquipos;
 }
