@@ -151,7 +151,7 @@
             msg.textContent = '';
 
             try {
-                const res  = await apiFetch(`${API_URL}/auth.php`, {
+                const res  = await fetch(`${API_URL}/auth.php`, {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body:    JSON.stringify({ username, password }),
