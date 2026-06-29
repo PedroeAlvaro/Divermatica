@@ -1,10 +1,11 @@
 <?php
 
 $env_path = __DIR__ . '/../.env';
-if (file_exists($env_path)) {
+if (!isset($_ENV['DB_HOST']) && file_exists($env_path)) {
     $linhas = file($env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($linhas as $linha) {
-        if (str_starts_with(trim($linha), '#')) continue;
+        $linha = trim($linha);
+        if ($linha === '' || str_starts_with($linha, '#')) continue;
         if (!str_contains($linha, '=')) continue;
         [$chave, $valor] = explode('=', $linha, 2);
         $_ENV[trim($chave)] = trim($valor);
