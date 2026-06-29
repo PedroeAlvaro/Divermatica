@@ -1,13 +1,5 @@
 <?php
 
-header("Access-Control-Allow-Origin: https://felipesmb.github.io");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, ngrok-skip-browser-warning");
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
 require_once __DIR__ . '/init.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
@@ -38,18 +30,14 @@ $stmt = $pdo->prepare('SELECT id, username, password_hash, role FROM usuarios WH
 $stmt->execute([$username]);
 $utilizador = $stmt->fetch();
 
-// Obtener IP del cliente
 $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'desconocido';
 
 if (!$utilizador || !password_verify($password, $utilizador['password_hash'])) {
-    // Registrar log de login fallido
     try {
         $stmtLog = $pdo->prepare('INSERT INTO admin_logs (tipo, username, ip, detalhes) VALUES (?, ?, ?, ?)');
         $stmtLog->execute(['login_falhou', $username, $ip, 'Credenciais inválidas']);
-    } catch (Exception $e) {
-        // Silenciar errores de logging
-    }
-    
+    } catch (Exception $e) {}
+
     http_response_code(401);
     echo json_encode(['erro' => 'Credenciais inválidas']);
     exit;
@@ -70,13 +58,10 @@ $token = jwt_generate([
     'role'     => $utilizador['role'],
 ], $secret, $expiry);
 
-// Registrar log de login exitoso
 try {
     $stmtLog = $pdo->prepare('INSERT INTO admin_logs (tipo, username, ip, detalhes) VALUES (?, ?, ?, ?)');
     $stmtLog->execute(['login', $utilizador['username'], $ip, 'Login bem-sucedido']);
-} catch (Exception $e) {
-    // Silenciar errores de logging
-}
+} catch (Exception $e) {}
 
 echo json_encode([
     'token'     => $token,
