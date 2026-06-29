@@ -65,5 +65,16 @@ $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 $stmt = $pdo->prepare('INSERT INTO usuarios (username, password_hash) VALUES (?, ?)');
 $stmt->execute([$username, $hash]);
 
+// Obtener IP del cliente
+$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'desconocido';
+
+// Registrar log de registo
+try {
+    $stmtLog = $pdo->prepare('INSERT INTO admin_logs (tipo, username, ip, detalhes) VALUES (?, ?, ?, ?)');
+    $stmtLog->execute(['registro', $username, $ip, 'Novo utilizador registado']);
+} catch (Exception $e) {
+    // Silenciar errores de logging
+}
+
 http_response_code(201);
 echo json_encode(['ok' => true]);

@@ -34,11 +34,22 @@ if ($username === '' || $password === '') {
     exit;
 }
 
-$stmt = $pdo->prepare('SELECT id, username, password_hash FROM usuarios WHERE username = ? LIMIT 1');
+$stmt = $pdo->prepare('SELECT id, username, password_hash, role FROM usuarios WHERE username = ? LIMIT 1');
 $stmt->execute([$username]);
 $utilizador = $stmt->fetch();
 
+// Obtener IP del cliente
+$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'desconocido';
+
 if (!$utilizador || !password_verify($password, $utilizador['password_hash'])) {
+    // Registrar log de login fallido
+    try {
+        $stmtLog = $pdo->prepare('INSERT INTO admin_logs (tipo, username, ip, detalhes) VALUES (?, ?, ?, ?)');
+        $stmtLog->execute(['login_falhou', $username, $ip, 'Credenciais inválidas']);
+    } catch (Exception $e) {
+        // Silenciar errores de logging
+    }
+    
     http_response_code(401);
     echo json_encode(['erro' => 'Credenciais inválidas']);
     exit;
@@ -56,7 +67,16 @@ if ($secret === '' || $secret === 'CHANGE_THIS_TO_A_RANDOM_64_CHAR_STRING_BEFORE
 $token = jwt_generate([
     'sub'      => $utilizador['id'],
     'username' => $utilizador['username'],
+    'role'     => $utilizador['role'],
 ], $secret, $expiry);
+
+// Registrar log de login exitoso
+try {
+    $stmtLog = $pdo->prepare('INSERT INTO admin_logs (tipo, username, ip, detalhes) VALUES (?, ?, ?, ?)');
+    $stmtLog->execute(['login', $utilizador['username'], $ip, 'Login bem-sucedido']);
+} catch (Exception $e) {
+    // Silenciar errores de logging
+}
 
 echo json_encode([
     'token'     => $token,
