@@ -6,9 +6,12 @@
     <title>MATCHORA - Generar Equipos</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+
     <nav class="navbar">
         <div class="nav-brand">MATCHORA</div>
+
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="jugadores.html">Jugadores</a></li>
@@ -17,22 +20,28 @@
         </ul>
 
         <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
-
     </nav>
 
     <main class="contenido">
+
         <h2 class="modulo-titulo">Generar Equipos Equilibrados</h2>
 
         <div class="equipos-layout">
+
+            <!-- LISTA JOGADORES -->
             <div class="panel-jugadores">
                 <h3>Jugadores disponibles</h3>
+
                 <ul id="listaJugadoresEquipos" class="lista-jugadores-web">
                     <li>Cargando...</li>
                 </ul>
+
                 <p id="totalJugadores" class="hint"></p>
             </div>
 
+            <!-- PAINEL DIREITO -->
             <div class="panel-resultado">
+
                 <div class="config-equipos">
 
                     <label>Deporte:</label>
@@ -52,38 +61,47 @@
 
                 </div>
 
+                <!-- RESULTADO + CAMPO -->
                 <div id="resultadoEquipos" class="resultado-equipos">
 
-    <div class="campo-container">
+                    <!-- CAMPO -->
+                    <div class="campo-container">
 
-        <div class="campo">
+                        <div class="campo">
 
-            <div class="linha-central"></div>
+                            <!-- ELEMENTOS DO CAMPO -->
+                            <div class="linha-central"></div>
+                            <div class="circulo-centro"></div>
 
-            <div class="circulo-centro"></div>
+                            <div class="area area-esquerda"></div>
+                            <div class="pequena-area pequena-esquerda"></div>
 
-            <div class="area area-esquerda"></div>
-            <div class="pequena-area pequena-esquerda"></div>
+                            <div class="area area-direita"></div>
+                            <div class="pequena-area pequena-direita"></div>
 
-            <div class="area area-direita"></div>
-            <div class="pequena-area pequena-direita"></div>
+                            <!-- JOGADORES (JS VAI PÔR AQUI) -->
+                            <div id="campoJugadores"></div>
 
-            <div id="campoJugadores"></div>
+                        </div>
 
-        </div>
+                    </div>
 
-    </div>
+                    <!-- EQUIPAS GERADAS -->
+                    <div id="equiposGenerados"></div>
 
-    <div id="equiposGenerados"></div>
+                </div>
 
-</div>
                 <p id="mensajeEquipos" class="mensaje-estado"></p>
+
             </div>
+
         </div>
+
     </main>
 
     <script src="js/app.js"></script>
     <script src="js/equipos.js"></script>
     <script>iniciarModuloEquipos();</script>
+
 </body>
 </html>

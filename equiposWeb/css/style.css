@@ -1553,3 +1553,63 @@ tbody strong { color: var(--text-primary); font-weight: 600; }
 
     font-size:11px;
 }
+/* ===== CAMPO ===== */
+
+.campo-wrap{
+    margin-top:20px;
+}
+
+.campo-title{
+    font-weight:bold;
+    margin-bottom:10px;
+    color:#fff;
+}
+
+.campo-svg-wrap{
+    position:relative;
+    width:900px;
+    max-width:100%;
+}
+
+.campo{
+    width:100%;
+    height:auto;
+    display:block;
+}
+
+/* camada dos jogadores por cima do campo */
+#playersLayer{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+}
+
+/* ===== JOGADORES ===== */
+
+.player-token{
+    position:absolute;
+    transform:translate(-50%, -50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    pointer-events:none;
+}
+
+.player-token .tok-circle{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:bold;
+    color:white;
+}
+
+.player-token .tok-name{
+    font-size:10px;
+    color:white;
+    margin-top:2px;
+}
