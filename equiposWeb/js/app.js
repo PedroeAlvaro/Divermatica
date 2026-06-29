@@ -2,9 +2,9 @@
 // app.js — adicionada camada de auth
 // ─────────────────────────────────────────────
 
-const API_URL = './api';
+const API_URL = 'https://deviancy-bulldozer-concave.ngrok-free.dev/equiposWeb/api';
 
-// ── Autenticação ─────────────────────────────
+// ── Autenticação 
 
 const PAGINAS_PROTEGIDAS = ['jugadores.html', 'deportes.html', 'equipos.html'];
 

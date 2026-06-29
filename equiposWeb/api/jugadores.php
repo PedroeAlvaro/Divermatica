@@ -12,7 +12,7 @@ require_once __DIR__ . '/conexion.php';
 rate_limit_verificar();
 
 $secret  = $_ENV['JWT_SECRET'] ?? '';
-$payload = jwt_verificar($secret);
+jwt_verificar($secret);
 
 $metodo = $_SERVER['REQUEST_METHOD'];
 
