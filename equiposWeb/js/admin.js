@@ -80,7 +80,7 @@ function navegarSeccion(seccion) {
 
 async function cargarDashboard() {
     try {
-        const response = await apiFetch(`${window.API_URL}admin_stats.php`);
+        const response = await apiFetch(`${API_URL}admin_stats.php`);
         const data = await response.json();
         
         if (!response.ok) {
@@ -121,7 +121,7 @@ async function cargarDashboard() {
 
 async function cargarUsuarios() {
     try {
-        const response = await apiFetch(`${window.API_URL}admin_usuarios.php`);
+        const response = await apiFetch(`${API_URL}admin_usuarios.php`);
         const data = await response.json();
         
         if (!response.ok) {
@@ -186,7 +186,7 @@ async function alterarRole(id, roleActual) {
     if (!confirm(textoConfirmar)) return;
     
     try {
-        const response = await apiFetch(`${window.API_URL}admin_usuarios.php`, {
+        const response = await apiFetch(`${API_URL}admin_usuarios.php`, {
             method: 'PUT',
             body: JSON.stringify({ id, role: roleNuevo })
         });
@@ -210,7 +210,7 @@ async function eliminarUsuario(id, username) {
     if (!confirm(textoConfirmar)) return;
     
     try {
-        const response = await apiFetch(`${window.API_URL}admin_usuarios.php?id=${id}`, {
+        const response = await apiFetch(`${API_URL}admin_usuarios.php?id=${id}`, {
             method: 'DELETE'
         });
         
@@ -234,7 +234,7 @@ async function cargarLogs() {
         const tipo = document.getElementById('filtro-tipo').value;
         const username = document.getElementById('filtro-username').value;
         
-        let url = `${window.API_URL}admin_logs.php`;
+        let url = `${API_URL}admin_logs.php`;
         const params = [];
         if (tipo) params.push(`tipo=${encodeURIComponent(tipo)}`);
         if (username) params.push(`username=${encodeURIComponent(username)}`);
@@ -274,7 +274,7 @@ async function cargarLogs() {
 
 async function cargarEstadisticas() {
     try {
-        const response = await apiFetch(`${window.API_URL}admin_stats.php`);
+        const response = await apiFetch(`${API_URL}admin_stats.php`);
         const data = await response.json();
         
         if (!response.ok) {
