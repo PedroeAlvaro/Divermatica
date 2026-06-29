@@ -58,7 +58,7 @@ async function apiFetch(url, opciones = {}) {
         ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
     };
 
-    const res = await fetch(url, { ...opciones, headers });
+    const res = await apiFetch(url, { ...opciones, headers });
 
     if (res.status === 401) {
         eliminarToken();
