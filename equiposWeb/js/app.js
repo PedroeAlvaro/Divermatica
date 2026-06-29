@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────
-// app.js — versão corrigida PRO
+// app.js — versão PRO estável
 // ─────────────────────────────────────────────
 
 const API_URL = 'https://deviancy-bulldozer-concave.ngrok-free.dev/equiposWeb/api';
 
 // ─────────────────────────────────────────────
-// AUTENTICAÇÃO
+// AUTH
 // ─────────────────────────────────────────────
 
 const PAGINAS_PROTEGIDAS = ['jugadores.html', 'deportes.html', 'equipos.html'];
@@ -52,7 +52,7 @@ function cerrarSesion() {
 }
 
 // ─────────────────────────────────────────────
-// API FETCH (CORRIGIDO)
+// API FETCH (CORRIGIDO DEFINITIVO)
 // ─────────────────────────────────────────────
 
 async function apiFetch(url, opciones = {}) {
@@ -65,19 +65,20 @@ async function apiFetch(url, opciones = {}) {
         ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
     };
 
-    // 🔥 AQUI ESTAVA O ERRO (não chamar apiFetch dentro de si mesmo)
-    const res = await fetch(url, {
-        ...opciones,
-        headers
-    });
+    try {
+        const res = await fetch(url, { ...opciones, headers });
 
-    if (res.status === 401) {
-        eliminarToken();
-        window.location.href = 'login.html';
+        if (res.status === 401) {
+            eliminarToken();
+            window.location.href = 'login.html';
+            return null;
+        }
+
+        return res;
+    } catch (err) {
+        console.error('Erro API:', err);
         return null;
     }
-
-    return res;
 }
 
 // ─────────────────────────────────────────────
@@ -95,26 +96,27 @@ function escapeHtml(value) {
     })[ch]);
 }
 
-function mostrarMensaje(elementoId, texto, esError = false) {
-    const el = document.getElementById(elementoId);
+function mostrarMensaje(id, texto, error = false) {
+    const el = document.getElementById(id);
     if (el) {
         el.textContent = texto;
-        el.style.color = esError ? '#C62828' : '#2E7D32';
+        el.style.color = error ? '#C62828' : '#2E7D32';
     }
 }
 
-function limpiarMensaje(elementoId) {
-    const el = document.getElementById(elementoId);
+function limpiarMensaje(id) {
+    const el = document.getElementById(id);
     if (el) el.textContent = '';
 }
 
 function badgeNivel(nivel) {
-    const clases = {
+    const map = {
         'Medio': 'nivel-medio',
         'Bueno': 'nivel-bueno',
         'Muy Bueno': 'nivel-muybueno'
     };
-    return `<span class="${clases[nivel] || 'nivel-medio'}">${nivel}</span>`;
+
+    return `<span class="${map[nivel] || 'nivel-medio'}">${nivel}</span>`;
 }
 
 function puntajeNivel(nivel) {
