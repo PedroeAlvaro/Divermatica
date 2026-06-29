@@ -3,15 +3,23 @@ let jugadoresEquipos = [];
 async function iniciarModuloEquipos() {
     try {
         const resJ = await apiFetch(`${API_URL}/jugadores.php`);
+        const resD = await apiFetch(`${API_URL}/deportes.php`);
+
+        if (!resJ || !resJ.ok || !resD || !resD.ok) {
+            mostrarMensaje('mensajeEquipos', '❌ Error al cargar datos', true);
+            return;
+        }
+
         jugadoresEquipos = await resJ.json();
         renderizarListaJugadores();
 
-        const resD = await apiFetch(`${API_URL}/deportes.php`);
         const deportes = await resD.json();
         const sel = document.getElementById('selDeporte');
-        sel.innerHTML = deportes.map(d =>
-            `<option value="${d.id}" data-num="${d.num_jugadores}">${d.nombre}</option>`
-        ).join('');
+        sel.innerHTML = deportes.length
+            ? deportes.map(d =>
+                `<option value="${d.id}" data-num="${d.num_jugadores}">${escapeHtml(d.nombre)}</option>`
+            ).join('')
+            : '<option value="">Sin deportes disponibles</option>';
 
         document.getElementById('numEquipos')
             .addEventListener('input', actualizarNombresEquipos);
@@ -45,9 +53,18 @@ function renderizarListaJugadores() {
 }
 
 function generarEquipos() {
-    const numEquipos = parseInt(document.getElementById('numEquipos').value);
+    const numEquipos = parseInt(document.getElementById('numEquipos').value, 10);
     const selDeporte = document.getElementById('selDeporte');
-    const limiteXEquipo = parseInt(selDeporte.selectedOptions[0]?.dataset.num || 99);
+    if (!selDeporte.selectedOptions.length) {
+        mostrarMensaje('mensajeEquipos', '⚠️ Seleccione un deporte', true);
+        return;
+    }
+
+    const limiteXEquipo = parseInt(selDeporte.selectedOptions[0]?.dataset.num || '0', 10);
+    if (!limiteXEquipo) {
+        mostrarMensaje('mensajeEquipos', '⚠️ Deporte inválido', true);
+        return;
+    }
 
     const nombres = Array.from({ length: numEquipos }, (_, i) => {
         const val = document.getElementById(`nombreEquipo${i}`).value.trim();
