@@ -7,13 +7,13 @@ async function cargarJugadores() {
     try {
         const res  = await apiFetch(`${API_URL}/jugadores.php`);
         if (!res || !res.ok) {
-            mostrarMensaje('mensajeEstado', '❌ Error al cargar jugadores', true);
+            mostrarMensaje('mensajeModalEstado', '❌ Error al cargar jugadores', true);
             return;
         }
         const data = await res.json();
         renderizarTabla(data);
     } catch (e) {
-        mostrarMensaje('mensajeEstado', '❌ Error al conectar con el servidor', true);
+        mostrarMensaje('mensajeModalEstado', '❌ Error al conectar con el servidor', true);
     }
 }
 
@@ -47,7 +47,7 @@ async function buscarJugador() {
     const texto = document.getElementById('txtBuscar').value.trim();
     const res   = await apiFetch(`${API_URL}/jugadores.php?buscar=${encodeURIComponent(texto)}`);
     if (!res || !res.ok) {
-        mostrarMensaje('mensajeEstado', '❌ Error al buscar jugadores', true);
+        mostrarMensaje('mensajeModalEstado', '❌ Error al buscar jugadores', true);
         return;
     }
     const data  = await res.json();
@@ -65,9 +65,9 @@ async function guardarJugador() {
     const nivel  = document.getElementById('fNivel').value;
     const posicion  = document.getElementById('fPosicion').value;
 
-    if (!nombre) { mostrarMensaje('mensajeEstado','⚠️ Nombre obligatorio', true); return; }
-    if (!nivel)  { mostrarMensaje('mensajeEstado','⚠️ Seleccione nivel',    true); return; }
-    if (!posicion)  { mostrarMensaje('mensajeEstado','⚠️ Seleccione posicion',    true); return; }
+    if (!nombre) { mostrarMensaje('mensajeModalEstado','⚠️ Nombre obligatorio', true); return; }
+    if (!nivel)  { mostrarMensaje('mensajeModalEstado','⚠️ Seleccione nivel',    true); return; }
+    if (!posicion)  { mostrarMensaje('mensajeModalEstado','⚠️ Seleccione posicion',    true); return; }
 
     const jugador = {
         nombre,
@@ -87,17 +87,17 @@ async function guardarJugador() {
     });
 
     if (!res || !res.ok) {
-        mostrarMensaje('mensajeEstado', '❌ Error al guardar', true);
+        mostrarMensaje('mensajeModalEstado', '❌ Error al guardar', true);
         return;
     }
 
     const data = await res.json();
     if (data.ok) {
-        mostrarMensaje('mensajeEstado', esEdicion ? '✅ Jugador actualizado' : '✅ Jugador guardado');
+        mostrarMensaje('mensajeModalEstado', esEdicion ? '✅ Jugador actualizado' : '✅ Jugador guardado');
         await cargarJugadores();
         limpiarFormulario();
     } else {
-        mostrarMensaje('mensajeEstado', '❌ Error al guardar', true);
+        mostrarMensaje('mensajeModalEstado', '❌ Error al guardar', true);
     }
 }
 
@@ -109,7 +109,7 @@ function editarJugador(id, nombre, telefono, mail, posicion, nivel) {
     document.getElementById('fMail').value     = mail     !== 'null' ? mail     : '';
     document.getElementById('fPosicion').value = posicion !== 'null' ? posicion : '';
     document.getElementById('fNivel').value    = nivel;
-    mostrarMensaje('mensajeEstado', '✏️ Modifique y presione Guardar');
+    mostrarMensaje('mensajeModalEstado', '✏️ Modifique y presione Guardar');
     document.getElementById('modalJugadorTitulo').textContent = 'Editar Jugador';
     document.getElementById('modalJugador').classList.add('ativo');
 }
