@@ -6,6 +6,10 @@ let idEditando = null;
 async function cargarJugadores() {
     try {
         const res  = await apiFetch(`${API_URL}/jugadores.php`);
+        if (!res || !res.ok) {
+            mostrarMensaje('mensajeEstado', '❌ Error al cargar jugadores', true);
+            return;
+        }
         const data = await res.json();
         renderizarTabla(data);
     } catch (e) {
@@ -22,15 +26,18 @@ function renderizarTabla(lista) {
     }
     cuerpo.innerHTML = lista.map(j => `
         <tr>
-            <td>${j.id}</td>
-            <td><strong>${j.nombre}</strong></td>
-            <td>${j.telefono || '—'}</td>
-            <td>${j.mail || '—'}</td>
-            <td>${j.posicion || '—'}</td>
+            <td>${escapeHtml(j.id)}</td>
+            <td><strong>${escapeHtml(j.nombre)}</strong></td>
+            <td>${escapeHtml(j.telefono || '—')}</td>
+            <td>${escapeHtml(j.mail || '—')}</td>
+            <td>${escapeHtml(j.posicion || '—')}</td>
             <td>${badgeNivel(j.nivel)}</td>
             <td>
-                <button class="btn-accion btn-accion-editar" onclick="editarJugador(${j.id},'${j.nombre}','${j.telefono}','${j.mail}','${j.posicion}','${j.nivel}')"></button>
-                <button class="btn-accion btn-accion-eliminar" onclick="eliminarJugador(${j.id})"></button>            </td>
+                <button class="btn-accion btn-accion-editar"
+                        onclick="editarJugador(${j.id}, ${JSON.stringify(j.nombre)}, ${JSON.stringify(j.telefono)}, ${JSON.stringify(j.mail)}, ${JSON.stringify(j.posicion)}, ${JSON.stringify(j.nivel)})"></button>
+                <button class="btn-accion btn-accion-eliminar"
+                        onclick="eliminarJugador(${j.id})"></button>
+            </td>
         </tr>
     `).join('');
 }
@@ -39,6 +46,10 @@ function renderizarTabla(lista) {
 async function buscarJugador() {
     const texto = document.getElementById('txtBuscar').value.trim();
     const res   = await apiFetch(`${API_URL}/jugadores.php?buscar=${encodeURIComponent(texto)}`);
+    if (!res || !res.ok) {
+        mostrarMensaje('mensajeEstado', '❌ Error al buscar jugadores', true);
+        return;
+    }
     const data  = await res.json();
     renderizarTabla(data);
 }
@@ -52,14 +63,11 @@ async function mostrarTodos() {
 async function guardarJugador() {
     const nombre = document.getElementById('fNombre').value.trim();
     const nivel  = document.getElementById('fNivel').value;
-	const posicion  = document.getElementById('fPosicion').value;
-
-	
+    const posicion  = document.getElementById('fPosicion').value;
 
     if (!nombre) { mostrarMensaje('mensajeEstado','⚠️ Nombre obligatorio', true); return; }
     if (!nivel)  { mostrarMensaje('mensajeEstado','⚠️ Seleccione nivel',    true); return; }
-	if (!posicion)  { mostrarMensaje('mensajeEstado','⚠️ Seleccione posicion',    true); return; }
-
+    if (!posicion)  { mostrarMensaje('mensajeEstado','⚠️ Seleccione posicion',    true); return; }
 
     const jugador = {
         nombre,
@@ -77,6 +85,11 @@ async function guardarJugador() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(jugador)
     });
+
+    if (!res || !res.ok) {
+        mostrarMensaje('mensajeEstado', '❌ Error al guardar', true);
+        return;
+    }
 
     const data = await res.json();
     if (data.ok) {
@@ -105,6 +118,10 @@ function editarJugador(id, nombre, telefono, mail, posicion, nivel) {
 async function eliminarJugador(id) {
     if (!confirm('¿Eliminar este jugador?')) return;
     const res  = await apiFetch(`${API_URL}/jugadores.php?id=${id}`, { method: 'DELETE' });
+    if (!res || !res.ok) {
+        mostrarMensaje('mensajeEstado', '❌ Error al eliminar', true);
+        return;
+    }
     const data = await res.json();
     if (data.ok) {
         mostrarMensaje('mensajeEstado', '✅ Jugador eliminado');
