@@ -19,7 +19,10 @@ async function cargarDeportes() {
             <td>${escapeHtml(d.num_jugadores)}</td>
             <td>
                 <button class="btn-accion btn-accion-editar"
-                        onclick="editarDeporte(${d.id}, ${JSON.stringify(d.nombre)}, ${d.num_jugadores})"></button>
+        data-id="${d.id}"
+        data-nombre="${escapeHtml(d.nombre)}"
+        data-num="${d.num_jugadores}"
+        onclick="editarDeporteDesdeBoton(this)"></button>
                 <button class="btn-accion btn-accion-eliminar"
                         onclick="eliminarDeporte(${d.id})"></button>
             </td>
@@ -107,4 +110,12 @@ function abrirModalDeporte() {
 function cerrarModalDeporte() {
     document.getElementById('modalDeporte').classList.remove('ativo');
     limpiarMensaje('mensajeDeporte');
+}
+
+function editarDeporteDesdeBoton(btn) {
+    editarDeporte(
+        btn.dataset.id,
+        btn.dataset.nombre,
+        parseInt(btn.dataset.num, 10)
+    );
 }

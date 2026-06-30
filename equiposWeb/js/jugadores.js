@@ -34,7 +34,13 @@ function renderizarTabla(lista) {
             <td>${badgeNivel(j.nivel)}</td>
             <td>
                 <button class="btn-accion btn-accion-editar"
-                        onclick="editarJugador(${j.id}, ${JSON.stringify(j.nombre)}, ${JSON.stringify(j.telefono)}, ${JSON.stringify(j.mail)}, ${JSON.stringify(j.posicion)}, ${JSON.stringify(j.nivel)})"></button>
+        data-id="${j.id}"
+        data-nombre="${escapeHtml(j.nombre)}"
+        data-telefono="${escapeHtml(j.telefono || '')}"
+        data-mail="${escapeHtml(j.mail || '')}"
+        data-posicion="${escapeHtml(j.posicion || '')}"
+        data-nivel="${escapeHtml(j.nivel)}"
+        onclick="editarJugadorDesdeBoton(this)"></button>
                 <button class="btn-accion btn-accion-eliminar"
                         onclick="eliminarJugador(${j.id})"></button>
             </td>
@@ -150,4 +156,15 @@ function abrirModalJugador() {
 function cerrarModalJugador() {
     document.getElementById('modalJugador').classList.remove('ativo');
     limpiarMensaje('mensajeModalEstado');
+}
+
+function editarJugadorDesdeBoton(btn) {
+    editarJugador(
+        btn.dataset.id,
+        btn.dataset.nombre,
+        btn.dataset.telefono,
+        btn.dataset.mail,
+        btn.dataset.posicion,
+        btn.dataset.nivel
+    );
 }
