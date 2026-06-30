@@ -1,1 +1,1 @@
-const API_URL = 'https://deviancy-bulldozer-concave.ngrok-free.dev';
+const API_URL = 'https://deviancy-bulldozer-concave.ngrok-free.dev/equiposWeb/api';
