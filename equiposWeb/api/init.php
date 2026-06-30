@@ -14,13 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-function api_enviar_cabeceras(): void {
-    header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
-    header('Access-Control-Max-Age: 86400');
-}
 
 function carregar_env(): void {
     $env_path = __DIR__ . '/../.env';
@@ -42,6 +35,4 @@ function carregar_env(): void {
         $_ENV[trim($chave)] = trim($valor);
     }
 }
-
-api_enviar_cabeceras();
 carregar_env();
