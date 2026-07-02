@@ -1,7 +1,5 @@
-
-
 let idEditando = null;
-
+let deportesCache = [];
 
 async function cargarJugadores() {
     try {
@@ -17,11 +15,44 @@ async function cargarJugadores() {
     }
 }
 
+async function cargarDeportesSelect() {
+    const res = await apiFetch(`${API_URL}/deportes.php`);
+    if (!res || !res.ok) return;
+    deportesCache = await res.json();
+
+    const sel = document.getElementById('fDeporte');
+    sel.innerHTML = '<option value="">— Seleccionar —</option>' +
+        deportesCache.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+
+    sel.addEventListener('change', (e) => cargarPosicionesSelect(e.target.value));
+}
+
+async function cargarPosicionesSelect(deporteId, posicionSeleccionada = '') {
+    const sel = document.getElementById('fPosicion');
+
+    if (!deporteId) {
+        sel.innerHTML = '<option value="">Elige un deporte primero</option>';
+        return;
+    }
+
+    const res = await apiFetch(`${API_URL}/posiciones.php?deporte_id=${deporteId}`);
+    if (!res || !res.ok) {
+        sel.innerHTML = '<option value="">Error al cargar posiciones</option>';
+        return;
+    }
+    const posiciones = await res.json();
+
+    sel.innerHTML = '<option value="">— Seleccionar —</option>' +
+        posiciones.map(p => `<option value="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</option>`).join('');
+
+    if (posicionSeleccionada) sel.value = posicionSeleccionada;
+}
+
 
 function renderizarTabla(lista) {
     const cuerpo = document.getElementById('cuerpoTabla');
     if (!lista.length) {
-        cuerpo.innerHTML = '<tr><td colspan="7" class="sin-datos">No hay jugadores</td></tr>';
+        cuerpo.innerHTML = '<tr><td colspan="8" class="sin-datos">No hay jugadores</td></tr>';
         return;
     }
     cuerpo.innerHTML = lista.map(j => `
@@ -30,6 +61,7 @@ function renderizarTabla(lista) {
             <td><strong>${escapeHtml(j.nombre)}</strong></td>
             <td>${escapeHtml(j.telefono || '—')}</td>
             <td>${escapeHtml(j.mail || '—')}</td>
+            <td>${escapeHtml(j.deporte_nombre || '—')}</td>
             <td>${escapeHtml(j.posicion || '—')}</td>
             <td>${badgeNivel(j.nivel)}</td>
             <td>
@@ -38,6 +70,7 @@ function renderizarTabla(lista) {
         data-nombre="${escapeHtml(j.nombre)}"
         data-telefono="${escapeHtml(j.telefono || '')}"
         data-mail="${escapeHtml(j.mail || '')}"
+        data-deporte-id="${j.deporte_id || ''}"
         data-posicion="${escapeHtml(j.posicion || '')}"
         data-nivel="${escapeHtml(j.nivel)}"
         onclick="editarJugadorDesdeBoton(this)"></button>
@@ -67,19 +100,21 @@ async function mostrarTodos() {
 
 
 async function guardarJugador() {
-    const nombre = document.getElementById('fNombre').value.trim();
-    const nivel  = document.getElementById('fNivel').value;
+    const nombre    = document.getElementById('fNombre').value.trim();
+    const nivel     = document.getElementById('fNivel').value;
+    const deporteId = document.getElementById('fDeporte').value;
     const posicion  = document.getElementById('fPosicion').value;
 
     if (!nombre) { mostrarMensaje('mensajeModalEstado','⚠️ Nombre obligatorio', true); return; }
     if (!nivel)  { mostrarMensaje('mensajeModalEstado','⚠️ Seleccione nivel',    true); return; }
-    if (!posicion)  { mostrarMensaje('mensajeModalEstado','⚠️ Seleccione posicion',    true); return; }
+    if (!deporteId) { mostrarMensaje('mensajeModalEstado','⚠️ Seleccione deporte', true); return; }
 
     const jugador = {
         nombre,
-        telefono: document.getElementById('fTelefono').value.trim(),
-        mail:     document.getElementById('fMail').value.trim(),
-        posicion: document.getElementById('fPosicion').value,
+        telefono:   document.getElementById('fTelefono').value.trim(),
+        mail:       document.getElementById('fMail').value.trim(),
+        deporte_id: parseInt(deporteId, 10),
+        posicion,
         nivel
     };
 
@@ -108,13 +143,16 @@ async function guardarJugador() {
 }
 
 
-function editarJugador(id, nombre, telefono, mail, posicion, nivel) {
+async function editarJugador(id, nombre, telefono, mail, deporteId, posicion, nivel) {
     idEditando = id;
     document.getElementById('fNombre').value   = nombre;
     document.getElementById('fTelefono').value = telefono !== 'null' ? telefono : '';
     document.getElementById('fMail').value     = mail     !== 'null' ? mail     : '';
-    document.getElementById('fPosicion').value = posicion !== 'null' ? posicion : '';
+    document.getElementById('fDeporte').value  = deporteId || '';
     document.getElementById('fNivel').value    = nivel;
+
+    await cargarPosicionesSelect(deporteId, posicion);
+
     mostrarMensaje('mensajeModalEstado', '✏️ Modifique y presione Guardar');
     document.getElementById('modalJugadorTitulo').textContent = 'Editar Jugador';
     document.getElementById('modalJugador').classList.add('ativo');
@@ -141,7 +179,8 @@ function limpiarFormulario() {
     ['fNombre','fTelefono','fMail'].forEach(id =>
         document.getElementById(id).value = ''
     );
-    document.getElementById('fPosicion').value = '';
+    document.getElementById('fDeporte').value = '';
+    document.getElementById('fPosicion').innerHTML = '<option value="">Elige un deporte primero</option>';
     document.getElementById('fNivel').value    = '';
     limpiarMensaje('mensajeModalEstado');
 }
@@ -164,6 +203,7 @@ function editarJugadorDesdeBoton(btn) {
         btn.dataset.nombre,
         btn.dataset.telefono,
         btn.dataset.mail,
+        btn.dataset.deporteId,
         btn.dataset.posicion,
         btn.dataset.nivel
     );

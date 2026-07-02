@@ -12,12 +12,13 @@ function sanitizar_inteiro(mixed $valor, int $min = 1, int $max = PHP_INT_MAX): 
     return ($int === false) ? null : (int)$int;
 }
 
-function validar_jogador(array $dados): array {
-    $posicoes_validas = ['Portero', 'Defensa', 'Lateral', 'Mediocampista', 'Delantero', ''];
-    $niveis_validos   = ['Medio', 'Bueno', 'Muy Bueno'];
+function validar_jogador(array $dados, PDO $pdo): array {
+    $niveis_validos = ['Medio', 'Bueno', 'Muy Bueno'];
 
-    $nome  = sanitizar_string($dados['nombre'] ?? '');
-    $nivel = sanitizar_string($dados['nivel']  ?? '');
+    $nome       = sanitizar_string($dados['nombre'] ?? '');
+    $nivel      = sanitizar_string($dados['nivel']  ?? '');
+    $deporte_id = sanitizar_inteiro($dados['deporte_id'] ?? null, 1);
+    $posicion   = sanitizar_string($dados['posicion'] ?? '');
 
     $erros = [];
 
@@ -31,9 +32,16 @@ function validar_jogador(array $dados): array {
         $erros[] = 'Nivel inválido. Valores aceites: ' . implode(', ', $niveis_validos);
     }
 
-    $posicion = sanitizar_string($dados['posicion'] ?? '');
-    if (!in_array($posicion, $posicoes_validas, true)) {
-        $erros[] = 'Posición inválida';
+    // La posición se valida contra las posiciones reales del deporte elegido
+    if ($deporte_id !== null) {
+        $stmtPos = $pdo->prepare('SELECT nombre FROM posiciones WHERE deporte_id = ?');
+        $stmtPos->execute([$deporte_id]);
+        $posicionesValidas   = array_column($stmtPos->fetchAll(), 'nombre');
+        $posicionesValidas[] = '';
+
+        if (!in_array($posicion, $posicionesValidas, true)) {
+            $erros[] = 'Posición inválida para el deporte seleccionado';
+        }
     }
 
     if (!empty($erros)) {
@@ -50,11 +58,12 @@ function validar_jogador(array $dados): array {
     }
 
     return [
-        'nombre'   => $nome,
-        'telefono' => sanitizar_string($dados['telefono'] ?? ''),
-        'mail'     => $mail,
-        'posicion' => $posicion,
-        'nivel'    => $nivel,
+        'nombre'     => $nome,
+        'telefono'   => sanitizar_string($dados['telefono'] ?? ''),
+        'mail'       => $mail,
+        'posicion'   => $posicion,
+        'nivel'      => $nivel,
+        'deporte_id' => $deporte_id,
     ];
 }
 

@@ -14,6 +14,7 @@
             <li><a href="jugadores.html" class="activo">Jugadores</a></li>
             <li><a href="deportes.html">Deportes</a></li>
             <li><a href="equipos.html">Generar Equipos</a></li>
+            <li><a href="historial.html">Historial</a></li>
         </ul>
 
         <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
@@ -56,14 +57,15 @@
                 <input type="email" id="fMail" placeholder="correo@ejemplo.com">
             </div>
             <div class="form-grupo">
+                <label>Deporte *</label>
+                <select id="fDeporte">
+                    <option value="">— Seleccionar —</option>
+                </select>
+            </div>
+            <div class="form-grupo">
                 <label>Posición</label>
                 <select id="fPosicion">
-                    <option value="">— Seleccionar —</option>
-                    <option>Portero</option>
-                    <option>Defensa</option>
-                    <option>Lateral</option>
-                    <option>Mediocampista</option>
-                    <option>Delantero</option>
+                    <option value="">Elige un deporte primero</option>
                 </select>
             </div>
             <div class="form-grupo">
@@ -92,13 +94,14 @@
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Correo</th>
+                        <th>Deporte</th>
                         <th>Posición</th>
                         <th>Nivel</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="cuerpoTabla">
-                    <tr><td colspan="7" class="sin-datos">Cargando...</td></tr>
+                    <tr><td colspan="8" class="sin-datos">Cargando...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -108,6 +111,6 @@
     <script src="js/config.js"></script>
     <script src="js/app.js"></script>
     <script src="js/jugadores.js"></script>
-    <script>cargarJugadores();</script>
+    <script>cargarJugadores(); cargarDeportesSelect();</script>
 </body>
 </html>

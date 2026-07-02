@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATCHORA - Historial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">MATCHORA</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="jugadores.html">Jugadores</a></li>
+            <li><a href="deportes.html">Deportes</a></li>
+            <li><a href="equipos.html">Generar Equipos</a></li>
+            <li><a href="historial.html" class="activo">Historial</a></li>
+        </ul>
+        <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
+    </nav>
+
+    <main class="contenido">
+        <h2 class="modulo-titulo">Historial de Partidos</h2>
+
+        <div id="vistaLista">
+            <ul id="listaPartidos" class="lista-jugadores-web">
+                <li>Cargando...</li>
+            </ul>
+        </div>
+
+        <div id="vistaDetalle" style="display:none;">
+            <button class="btn-secundario" onclick="volverALista()">‹ Volver</button>
+            <div id="detallePartido"></div>
+        </div>
+
+        <p id="mensajeHistorial" class="mensaje-estado"></p>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/historial.js"></script>
+    <script>cargarHistorial();</script>
+</body>
+</html>

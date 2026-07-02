@@ -17,6 +17,7 @@
             <li><a href="jugadores.html">Jugadores</a></li>
             <li><a href="deportes.html">Deportes</a></li>
             <li><a href="equipos.html" class="activo">Generar Equipos</a></li>
+            <li><a href="historial.html">Historial</a></li>
         </ul>
 
         <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
@@ -88,6 +89,8 @@
 
                     <!-- EQUIPAS GERADAS -->
                     <div id="equiposGenerados"></div>
+
+                    <button class="btn-generar" id="btnGuardarPartido" style="display:none;margin-top:16px;" onclick="guardarPartido()">💾 Guardar en Historial</button>
 
                 </div>
 

@@ -1,4 +1,6 @@
 let jugadoresEquipos = [];
+let deportesCache = [];
+let equiposActuales = [];
 
 // ─────────────────────────────────────────────
 // INICIALIZAÇÃO
@@ -6,42 +8,53 @@ let jugadoresEquipos = [];
 
 async function iniciarModuloEquipos() {
     try {
-        const [resJ, resD] = await Promise.all([
-            apiFetch(`${API_URL}/jugadores.php`),
-            apiFetch(`${API_URL}/deportes.php`)
-        ]);
-
-        if (!resJ || !resD || !resJ.ok || !resD.ok) {
-            mostrarMensaje('mensajeEquipos', '❌ Error al cargar datos', true);
+        const resD = await apiFetch(`${API_URL}/deportes.php`);
+        if (!resD || !resD.ok) {
+            mostrarMensaje('mensajeEquipos', '❌ Error al cargar deportes', true);
             return;
         }
-
-        const jugadores = await resJ.json();
-        const deportes = await resD.json();
-
-        jugadoresEquipos = Array.isArray(jugadores) ? jugadores : [];
-
-        renderizarListaJugadores();
+        deportesCache = await resD.json();
 
         const sel = document.getElementById('selDeporte');
-
-        sel.innerHTML = Array.isArray(deportes) && deportes.length
-            ? deportes.map(d => `
+        sel.innerHTML = deportesCache.length
+            ? deportesCache.map(d => `
                 <option value="${d.id}" data-num="${d.num_jugadores}">
                     ${escapeHtml(d.nombre)}
                 </option>
             `).join('')
             : '<option value="">Sin deportes disponibles</option>';
 
+        sel.addEventListener('change', cargarJugadoresDelDeporte);
         document.getElementById('numEquipos')
             .addEventListener('input', actualizarNombresEquipos);
 
         actualizarNombresEquipos();
+        await cargarJugadoresDelDeporte();
 
     } catch (err) {
         console.error(err);
         mostrarMensaje('mensajeEquipos', '❌ Error inesperado', true);
     }
+}
+
+async function cargarJugadoresDelDeporte() {
+    const sel = document.getElementById('selDeporte');
+    const deporteId = sel.value;
+
+    if (!deporteId) {
+        jugadoresEquipos = [];
+        renderizarListaJugadores();
+        return;
+    }
+
+    const res = await apiFetch(`${API_URL}/jugadores.php?deporte_id=${deporteId}`);
+    if (!res || !res.ok) {
+        mostrarMensaje('mensajeEquipos', '❌ Error al cargar jugadores', true);
+        return;
+    }
+    const jugadores = await res.json();
+    jugadoresEquipos = Array.isArray(jugadores) ? jugadores : [];
+    renderizarListaJugadores();
 }
 
 // ─────────────────────────────────────────────
@@ -68,57 +81,67 @@ function renderizarListaJugadores() {
     const lista = document.getElementById('listaJugadoresEquipos');
     const total = document.getElementById('totalJugadores');
 
-    lista.innerHTML = jugadoresEquipos.map(j =>
-        `<li>${j.nombre} — ${j.posicion || '—'} — ${badgeNivel(j.nivel)}</li>`
-    ).join('');
+    lista.innerHTML = jugadoresEquipos.length
+        ? jugadoresEquipos.map(j =>
+            `<li>${escapeHtml(j.nombre)} — ${escapeHtml(j.posicion || 'Sin posición')} — ${badgeNivel(j.nivel)}</li>`
+          ).join('')
+        : '<li>Selecciona un deporte para ver sus jugadores</li>';
 
     total.textContent = `Total: ${jugadoresEquipos.length}`;
 }
 
 // ─────────────────────────────────────────────
-// GERAR EQUIPOS
+// GERAR EQUIPOS — balanceado por nivel Y posición
 // ─────────────────────────────────────────────
 
 function generarEquipos() {
     const numEquipos = parseInt(document.getElementById('numEquipos').value, 10);
 
     const sel = document.getElementById('selDeporte');
-    if (!sel.selectedOptions.length) {
+    if (!sel.value) {
         mostrarMensaje('mensajeEquipos', '⚠️ Seleccione un deporte', true);
         return;
     }
 
-    const limite = parseInt(sel.selectedOptions[0].dataset.num || 0, 10);
-
-    if (!limite || jugadoresEquipos.length === 0) {
-        mostrarMensaje('mensajeEquipos', '⚠️ Datos insuficientes', true);
+    if (jugadoresEquipos.length === 0) {
+        mostrarMensaje('mensajeEquipos', '⚠️ No hay jugadores para este deporte', true);
         return;
     }
 
-    const max = limite * numEquipos;
-    const usados = jugadoresEquipos.slice(0, max);
-
-    const ordenados = [...usados].sort(
-        (a, b) => puntajeNivel(b.nivel) - puntajeNivel(a.nivel)
-    );
+    // Agrupa por posición para que ningún equipo quede
+    // solo con jugadores de la misma posición
+    const grupos = {};
+    jugadoresEquipos.forEach(j => {
+        const pos = j.posicion || 'Sin posición';
+        if (!grupos[pos]) grupos[pos] = [];
+        grupos[pos].push(j);
+    });
 
     const equipos = Array.from({ length: numEquipos }, () => []);
 
-    let i = 0;
-    let dir = 1;
+    Object.values(grupos).forEach(grupo => {
+        const ordenado = [...grupo].sort(
+            (a, b) => puntajeNivel(b.nivel) - puntajeNivel(a.nivel)
+        );
 
-    for (const j of ordenados) {
-        equipos[i].push(j);
+        let i = 0;
+        let dir = 1;
 
-        if (dir === 1) {
-            if (i === numEquipos - 1) dir = -1;
-            else i++;
-        } else {
-            if (i === 0) dir = 1;
-            else i--;
+        for (const j of ordenado) {
+            equipos[i].push(j);
+
+            if (dir === 1) {
+                if (i === numEquipos - 1) dir = -1;
+                else i++;
+            } else {
+                if (i === 0) dir = 1;
+                else i--;
+            }
         }
-    }
+    });
 
+    equiposActuales = equipos;
+    mostrarMensaje('mensajeEquipos', '✅ Equipos generados');
     renderizarEquiposCards(equipos);
 }
 
@@ -127,25 +150,62 @@ function generarEquipos() {
 // ─────────────────────────────────────────────
 
 function renderizarEquiposCards(equipos) {
-    const container = document.getElementById('resultadoEquipos');
+    const container = document.getElementById('equiposGenerados');
     container.innerHTML = '';
 
     equipos.forEach((eq, i) => {
-
         const card = document.createElement('div');
         card.className = 'equipo-card';
 
         card.innerHTML = `
-            <h3>Equipo ${i + 1}</h3>
+            <h3>${document.getElementById('nombreEquipo' + i)?.value || ('Equipo ' + (i + 1))}</h3>
             ${eq.map(j => `
-                <div>${j.nombre} — ${j.nivel}</div>
+                <div>${escapeHtml(j.nombre)} — ${escapeHtml(j.posicion || 'Sin posición')} — ${j.nivel}</div>
             `).join('')}
+            <div style="margin-top:8px;">
+                <label>Resultado:</label>
+                <input type="number" id="puntuacionEquipo${i}" placeholder="Goles / puntos">
+            </div>
         `;
 
         container.appendChild(card);
     });
-    window.abrirCampo = abrirCampo;
-window.fecharCampo = fecharCampo;
+
+    document.getElementById('btnGuardarPartido').style.display = equipos.length ? 'inline-block' : 'none';
+}
+
+// ─────────────────────────────────────────────
+// GUARDAR EN HISTORIAL
+// ─────────────────────────────────────────────
+
+async function guardarPartido() {
+    if (equiposActuales.length === 0) return;
+
+    const deporteId = document.getElementById('selDeporte').value;
+
+    const body = {
+        deporte_id: parseInt(deporteId, 10),
+        numero_equipos: equiposActuales.length,
+        equipos: equiposActuales.map((eq, i) => ({
+            nombre_equipo: document.getElementById('nombreEquipo' + i)?.value || ('Equipo ' + (i + 1)),
+            puntuacion: document.getElementById('puntuacionEquipo' + i)?.value || null,
+            jugadores: eq.map(j => ({ id: j.id, nombre: j.nombre, posicion: j.posicion })),
+        })),
+    };
+
+    const res = await apiFetch(`${API_URL}/partidos.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+
+    if (res && res.ok) {
+        mostrarMensaje('mensajeEquipos', '✅ Partido guardado en el historial');
+    } else {
+        mostrarMensaje('mensajeEquipos', '❌ Error al guardar el partido', true);
+    }
+}
+
 window.iniciarModuloEquipos = iniciarModuloEquipos;
 window.generarEquipos = generarEquipos;
-}
+window.guardarPartido = guardarPartido;
