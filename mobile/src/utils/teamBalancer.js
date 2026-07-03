@@ -1,9 +1,10 @@
-export function puntajeNivel(nivel) {
-    if (nivel === 'Muy Bueno') return 3;
-    if (nivel === 'Bueno') return 2;
-    return 1;
-}
+import { puntajeNivel } from './nivel';
 
+export { puntajeNivel };
+
+// Agrupa los jugadores por posición y reparte cada grupo entre los equipos
+// en zig-zag según su nivel, para que ningún equipo quede con todos los
+// mejores (o todos los peores) jugadores de una misma posición.
 export function generarEquiposBalanceados(jugadores, numEquipos) {
     const grupos = {};
     jugadores.forEach(j => {
