@@ -9,7 +9,7 @@ export default function LoginScreen({ navigation }) {
     const [password, setPassword] = useState('');
     const [cargando, setCargando] = useState(false);
 
-    async function entrar() {
+    async function entrar() { b
         if (!username || !password) {
             Alert.alert('Atención', 'Rellena usuario y contraseña');
             return;
